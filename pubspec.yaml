@@ -1,0 +1,71 @@
+name: phodog
+description: A new Flutter project.
+
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.1.5 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  ## State Management
+  flutter_bloc: ^8.1.3
+
+  # UI
+  flutter_native_splash: ^2.3.5
+  cupertino_icons: ^1.0.2
+  flutter_svg: ^2.0.9
+
+  # Utils
+  flutter_screenutil: ^5.9.0
+  dio: ^5.3.3
+  bloc: ^8.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/2.0x/launcher.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+
+flutter_native_splash:
+  image: "assets/images/2.0x/launcher.png"
+  color: "#FFFFFF"
+  android_12:
+    color: "#FFFFFF"
+  web: false
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/vectors/
+  fonts:
+    - family: GalanoGrotesque
+      fonts:
+        - asset: assets/fonts/Galano-Grotesque/Galano-Grotesque-Thin.otf
+          weight: 100
+        - asset: assets/fonts/Galano-Grotesque/Galano-Grotesque-ExtraLight.otf
+          weight: 200
+        - asset: assets/fonts/Galano-Grotesque/Galano-Grotesque-Light.otf
+          weight: 300
+        - asset: assets/fonts/Galano-Grotesque/Galano-Grotesque.otf
+          weight: 400
+        - asset: assets/fonts/Galano-Grotesque/Galano-Grotesque-Medium.otf
+          weight: 500
+        - asset: assets/fonts/Galano-Grotesque/Galano-Grotesque-Bold.otf
+          weight: 700
+        - asset: assets/fonts/Galano-Grotesque/Galano-Grotesque-Black.otf
+          weight: 900
