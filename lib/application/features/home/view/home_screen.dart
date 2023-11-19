@@ -225,6 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: context.colors.notFoundDesc,
           ),
         ),
+        SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
       ],
     );
   }
