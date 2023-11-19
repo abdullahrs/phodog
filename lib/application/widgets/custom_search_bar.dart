@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class CustomSearchBar extends SearchBar {
   CustomSearchBar({
     super.key,
+    super.controller,
+    super.focusNode,
     Color? fillColor,
     Color? borderColor,
     double? borderWidth,

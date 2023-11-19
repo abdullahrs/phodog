@@ -6,6 +6,7 @@ import 'package:phodog/core/extensions/context_extensions.dart';
 import 'package:phodog/core/extensions/string_extensions.dart';
 
 import '../../../services/dogs/models/dog_model.dart';
+import '../../../widgets/buttons/rounded_button.dart';
 
 class DogDetail extends StatelessWidget {
   final Dog dog;
@@ -113,27 +114,8 @@ class DogDetail extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 16.h),
-                ElevatedButton(
-                  onPressed: onTapGenerate,
-                  style: ButtonStyle(
-                    minimumSize:
-                        MaterialStateProperty.all(Size(double.maxFinite, 56.h)),
-                    elevation: MaterialStateProperty.all(0),
-                    shadowColor: MaterialStateProperty.all(Colors.transparent),
-                    backgroundColor:
-                        MaterialStateProperty.all(context.colors.primary),
-                    surfaceTintColor:
-                        MaterialStateProperty.all(context.colors.primary),
-                    foregroundColor:
-                        MaterialStateProperty.all(context.colors.white),
-                    textStyle: MaterialStateProperty.all(
-                        context.appTextTheme.thinHeadline),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8).r,
-                      ),
-                    ),
-                  ),
+                RoundedButton(
+                  onTap: onTapGenerate,
                   child: const Text(AppStrings.generate),
                 ),
                 SizedBox(height: 16.h),

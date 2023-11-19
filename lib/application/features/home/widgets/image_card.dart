@@ -38,7 +38,7 @@ class ImageCard extends StatelessWidget {
             Positioned(
               left: 0,
               bottom: 0,
-              height: 38.h,
+              height: 38.w,
               child: ClipRRect(
                 borderRadius: BorderRadius.only(
                   topRight: const Radius.circular(16).r,

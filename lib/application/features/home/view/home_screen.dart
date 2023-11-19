@@ -11,6 +11,7 @@ import '../../../widgets/custom_search_bar.dart';
 import '../controller/home_actions.dart';
 import '../controller/home_controller_bloc.dart';
 import '../controller/home_results.dart';
+import '../widgets/draggable_search_field.dart';
 import '../widgets/image_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,20 +22,30 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late HomeControllerBloc homeControllerBloc;
+
   @override
   void initState() {
     super.initState();
+    homeControllerBloc = context.read<HomeControllerBloc>();
+    context.read<HomeControllerBloc>().initializeController();
     context
         .read<HomeControllerBloc>()
         .add(GetDogsList(context, page: 1, limit: 10, query: ''));
   }
 
   @override
+  void dispose() {
+    homeControllerBloc.resetValues();
+    super.dispose();
+  }
+
+  @override
   void didChangeDependencies() {
-    if (context.read<HomeControllerBloc>().dogs.isNotEmpty) {
+    if (context.read<HomeControllerBloc>().initialDogList.isNotEmpty) {
       // to avoid white flash beheviours,
       // recache the images when dependcies changed
-      for (var element in context.read<HomeControllerBloc>().dogs) {
+      for (var element in context.read<HomeControllerBloc>().initialDogList) {
         precacheImage(element.imageProvider!, context);
       }
     }
@@ -77,10 +88,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 right: 0,
                 height: 50.h,
                 child: Center(
-                  child: Text(
-                    AppStrings.appName,
-                    style: context.appTextTheme.defaultTitle3,
-                  ),
+                  child: Text(AppStrings.appName,
+                      style: context.appTextTheme.defaultTitle3),
                 ),
               ),
               Positioned(
@@ -89,6 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 right: 16.w,
                 height: 64.h,
                 child: CustomSearchBar(
+                  controller: homeControllerBloc.searchController,
+                  focusNode: homeControllerBloc.searchBarFocus,
                   fillColor: context.colors.white,
                   borderColor: context.colors.lilacMurmur,
                   borderWidth: 2.w,
@@ -97,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   hintStyle: context.appTextTheme.defaultBody,
                   focusedTextColor: context.colors.searchFocused,
                   unfocusedTextColor: context.colors.searchUnfocused,
-                  onTap: context.read<HomeControllerBloc>().onTapSearchBar,
+                  onTap: homeControllerBloc.onTapSearchBar,
                 ),
               ),
               Positioned(
@@ -120,6 +131,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
+              DraggableSearchField(
+                draggableScrollableController:
+                    homeControllerBloc.draggableScrollableController!,
+                textEditingController: homeControllerBloc.searchController,
+                focusNode: homeControllerBloc.draggableFocusNode,
+                onKeyboardStateChange: homeControllerBloc.keyboardFocusListener,
+              )
             ],
           ),
         ),
