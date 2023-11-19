@@ -92,20 +92,26 @@ class HomeControllerBloc extends Bloc<HomeAction, HomeActionResult>
             page: event.page, limit: event.limit, query: event.query));
       } else {
         for (int i = 0; i < result.length; i++) {
-          String imageUrl =
-              await dogService.getRandomImageByBreed(result[i].name);
-          try {
-            final imageProvider = NetworkImage(imageUrl);
+          bool hasError = false;
+          const maxNumberOfRetries = 3;
+          int numberOfRetry = 0;
+          NetworkImage imageProvider;
+          do {
+            hasError = false;
+            String imageUrl =
+                await dogService.getRandomImageByBreed(result[i].name);
+            imageProvider = NetworkImage(imageUrl);
             // ignore: use_build_context_synchronously
             await precacheImage(
               imageProvider,
               event.context,
-              onError: (exception, stackTrace) {},
+              onError: (exception, stackTrace) {
+                hasError = true;
+                numberOfRetry++;
+              },
             );
-            result[i] = result[i].copyWith(imageProvider: imageProvider);
-          } catch (e) {
-            // For 404 errors
-          }
+          } while (numberOfRetry > maxNumberOfRetries && !hasError);
+          result[i] = result[i].copyWith(imageProvider: imageProvider);
         }
       }
       if (state is HomeInitialState) {
