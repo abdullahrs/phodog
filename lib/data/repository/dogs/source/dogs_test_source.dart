@@ -8,22 +8,39 @@ import '../dogs_base_source.dart';
 class DogsTestSource implements DogsBaseSource {
   @override
   Future<List<BreedDTO>> getAllBreds(int page, int limit, String? query) async {
-    String json = """{"message": ["affenpinscher": [],
-        "african": [],
-        "airedale": [],
-        "akita": [],
-        "appenzeller": [],
-        "australian": [
-            "kelpie",
-            "shepherd"
-        ],
-        "bakharwal": [
-            "indian"
-        ],], "status": "success"}""";
+    String json = """{
+   "message":{
+      "affenpinscher":[
+         
+      ],
+      "african":[
+         
+      ],
+      "airedale":[
+         
+      ],
+      "akita":[
+         
+      ],
+      "appenzeller":[
+         
+      ],
+      "australian":[
+         "kelpie",
+         "shepherd"
+      ],
+      "bakharwal":[
+         "indian"
+      ]
+   },
+   "status":"success"
+}""";
     Map<String, dynamic> result = jsonDecode(json);
-    List<BreedDTO> values = BaseResponse.fromMap(result)
-        .data
-        .map((MapEntry e) => BreedDTO.fromMap(e.key, e.value));
+    BaseResponse envelopeModel = BaseResponse.fromMap(result);
+
+    List<BreedDTO> values = [];
+    envelopeModel.data.forEach(
+        (key, value) => values.add(BreedDTO.fromMap(key, List.from(value))));
     return values
         .where((element) =>
             element.type.toLowerCase().contains(query?.toLowerCase() ?? ''))
