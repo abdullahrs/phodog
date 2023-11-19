@@ -33,13 +33,6 @@ class GetDogsEmptyResult implements HomeActionResult {
 }
 
 @immutable
-class RandomDogImageResult implements HomeActionResult {
-  final String imageURL;
-
-  const RandomDogImageResult({required this.imageURL});
-}
-
-@immutable
 class HomeActionFailure implements HomeActionResult {
   final String? errorMessage;
   final StackTrace? stackTrace;
