@@ -13,6 +13,10 @@ dependencies:
     sdk: flutter
   ## State Management
   flutter_bloc: ^8.1.3
+  bloc: ^8.1.2
+
+  ## Network
+  dio: ^5.3.3
 
   # UI
   flutter_native_splash: ^2.3.5
@@ -21,8 +25,7 @@ dependencies:
 
   # Utils
   flutter_screenutil: ^5.9.0
-  dio: ^5.3.3
-  bloc: ^8.1.2
+  async: ^2.11.0
 
 dev_dependencies:
   flutter_test:
@@ -35,12 +38,12 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/2.0x/launcher.png"
+  image_path: "assets/images/3.0x/launcher.png"
   min_sdk_android: 21
   remove_alpha_ios: true
 
 flutter_native_splash:
-  image: "assets/images/2.0x/launcher.png"
+  image: "assets/images/3.0x/launcher.png"
   color: "#FFFFFF"
   android_12:
     color: "#FFFFFF"
