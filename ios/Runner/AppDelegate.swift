@@ -17,16 +17,16 @@ import Flutter
         result(FlutterMethodNotImplemented)
         return
       }
-      self?.getDeviceVersion(result: result)
+      self.getDeviceVersion(result: result)
     })
 
-    GeneratedPluginRegistrant.register(with: self)
+      GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
     private func getDeviceVersion(result: FlutterResult) {
       let device = UIDevice.current
-      var systemVersion = device.systemVersion
+        let systemVersion = device.systemVersion
       return result(String(systemVersion))
     }
 }
