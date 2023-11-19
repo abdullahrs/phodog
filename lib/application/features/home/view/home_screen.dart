@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:keyboard_detection/keyboard_detection.dart';
 
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../common/app_strings.dart';
@@ -54,91 +55,118 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true,
-      resizeToAvoidBottomInset: false,
-      body: GestureDetector(
-        onTap: FocusManager.instance.primaryFocus?.unfocus,
-        child: SafeArea(
-          child: Stack(
-            children: [
-              Positioned.fill(
-                top: 50.h,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16).w,
-                  child: BlocBuilder<HomeControllerBloc, HomeActionResult>(
-                    builder: (context, state) {
-                      if (state is HomeActionFailure) {
-                        return errorWidget(state.errorMessage);
-                      }
-                      if (state is GetDogsEmptyResult) {
-                        return notFoundWidget();
-                      }
-                      if (state is GetDogsResult) {
-                        return resultView(state);
-                      }
-                      return ListView();
-                    },
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: KeyboardDetection(
+        controller: KeyboardDetectionController(
+          onChanged: (value) {
+            if (value == KeyboardState.visible ||
+                value == KeyboardState.visibling) {
+              context
+                  .read<HomeControllerBloc>()
+                  .add(const KeyboardOpenAction());
+            }
+            if (value == KeyboardState.hidden) {
+              context
+                  .read<HomeControllerBloc>()
+                  .add(const KeyboardCloseAction());
+            }
+          },
+        ),
+        child: Scaffold(
+          extendBody: true,
+          resizeToAvoidBottomInset: false,
+          body: SafeArea(
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  top: 50.h,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16).w,
+                    child: BlocBuilder<HomeControllerBloc, HomeActionResult>(
+                      // This part only cares about the events below,
+                      // when the other events come doesn't rebuild unnecessarily
+                      buildWhen:
+                          (HomeActionResult prev, HomeActionResult current) {
+                        return current is HomeInitialState ||
+                            current is GetDogsResult ||
+                            current is HomeActionFailure ||
+                            current is GetDogsEmptyResult;
+                      },
+                      builder: (context, state) {
+                        if (state is HomeActionFailure) {
+                          return errorWidget(state.errorMessage);
+                        }
+                        if (state is GetDogsEmptyResult) {
+                          return notFoundWidget();
+                        }
+                        if (state is GetDogsResult) {
+                          return resultView(state);
+                        }
+                        return ListView();
+                      },
+                    ),
                   ),
                 ),
-              ),
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 50.h,
-                child: Center(
-                  child: Text(AppStrings.appName,
-                      style: context.appTextTheme.defaultTitle3),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 50.h,
+                  child: Center(
+                    child: Text(AppStrings.appName,
+                        style: context.appTextTheme.defaultTitle3),
+                  ),
                 ),
-              ),
-              Positioned(
-                bottom: 114.h,
-                left: 16.w,
-                right: 16.w,
-                height: 64.h,
-                child: CustomSearchBar(
-                  controller: homeControllerBloc.searchController,
-                  focusNode: homeControllerBloc.searchBarFocus,
-                  fillColor: context.colors.white,
-                  borderColor: context.colors.lilacMurmur,
-                  borderWidth: 2.w,
-                  borderRadius: 8.r,
-                  hintText: AppStrings.search,
-                  hintStyle: context.appTextTheme.defaultBody,
-                  focusedTextColor: context.colors.searchFocused,
-                  unfocusedTextColor: context.colors.searchUnfocused,
-                  onTap: homeControllerBloc.onTapSearchBar,
+                Positioned(
+                  bottom: 114.h,
+                  left: 16.w,
+                  right: 16.w,
+                  height: 64.h,
+                  child: CustomSearchBar(
+                    controller: homeControllerBloc.searchController,
+                    focusNode: homeControllerBloc.searchBarFocus,
+                    fillColor: context.colors.white,
+                    borderColor: context.colors.lilacMurmur,
+                    borderWidth: 2.w,
+                    borderRadius: 8.r,
+                    hintText: AppStrings.search,
+                    hintStyle: context.appTextTheme.defaultBody,
+                    focusedTextColor: context.colors.searchFocused,
+                    unfocusedTextColor: context.colors.searchUnfocused,
+                    onTap: homeControllerBloc.onTapSearchBar,
+                  ),
                 ),
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: 98.h,
-                child: CustomBottomNavigationBar(
-                  items: [
-                    const CustomBottomNavigationBarItem(
-                      label: AppStrings.home,
-                      iconPath: AssetPaths.home,
-                    ),
-                    CustomBottomNavigationBarItem(
-                      label: AppStrings.settings,
-                      iconPath: AssetPaths.settings,
-                      onTapItem:
-                          context.read<HomeControllerBloc>().onTapSettings,
-                    ),
-                  ],
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 98.h,
+                  child: CustomBottomNavigationBar(
+                    items: [
+                      const CustomBottomNavigationBarItem(
+                        label: AppStrings.home,
+                        iconPath: AssetPaths.home,
+                      ),
+                      CustomBottomNavigationBarItem(
+                        label: AppStrings.settings,
+                        iconPath: AssetPaths.settings,
+                        onTapItem:
+                            context.read<HomeControllerBloc>().onTapSettings,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              DraggableSearchField(
-                draggableScrollableController:
-                    homeControllerBloc.draggableScrollableController!,
-                textEditingController: homeControllerBloc.searchController,
-                focusNode: homeControllerBloc.draggableFocusNode,
-                onKeyboardStateChange: homeControllerBloc.keyboardFocusListener,
-              )
-            ],
+                DraggableSearchField(
+                  draggableScrollableController:
+                      homeControllerBloc.draggableScrollableController!,
+                  textEditingController: homeControllerBloc.searchController,
+                  focusNode: homeControllerBloc.draggableFocusNode,
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -225,7 +253,16 @@ class _HomeScreenState extends State<HomeScreen> {
             color: context.colors.notFoundDesc,
           ),
         ),
-        SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+        BlocBuilder<HomeControllerBloc, HomeActionResult>(
+          buildWhen: (HomeActionResult prev, HomeActionResult current) {
+            return current is KeyboardStateChange ||
+                current is HomeInitialState;
+          },
+          builder: (context, state) {
+            return SizedBox(
+                height: homeControllerBloc.keyboardIsOpen ? 250 : 0);
+          },
+        ),
       ],
     );
   }

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -36,10 +38,26 @@ class HomeControllerBloc extends Bloc<HomeAction, HomeActionResult>
   /// to prevent multiple sheet closing events
   bool closeAnimationLock = false;
 
+  // to store state of keyboard
+  bool keyboardIsOpen = false;
+
   HomeControllerBloc(this.dogService) : super(const HomeInitialState()) {
     on<HomeAction>(
       (event, emit) async {
         if (event is GetDogsList) await onGetAllDogs(event, emit);
+        // to prevent race condition between initial GetDogsList action
+        // and initial KeyboardEvents
+        if (initialDogList.isNotEmpty) {
+          if (event is KeyboardOpenAction) {
+            keyboardIsOpen = true;
+            emit(const KeyboardStateChange(KeyboardStatus.open));
+          }
+          if (event is KeyboardCloseAction) {
+            keyboardIsOpen = false;
+            emit(const KeyboardStateChange(KeyboardStatus.close));
+          }
+          keyboardFocusListener();
+        }
       },
     );
   }
@@ -101,7 +119,6 @@ class HomeControllerBloc extends Bloc<HomeAction, HomeActionResult>
             String imageUrl =
                 await dogService.getRandomImageByBreed(result[i].name);
             imageProvider = NetworkImage(imageUrl);
-            // ignore: use_build_context_synchronously
             await precacheImage(
               imageProvider,
               event.context,
@@ -128,19 +145,20 @@ class HomeControllerBloc extends Bloc<HomeAction, HomeActionResult>
   }
 
   Future<void> onTapSettings() async {
-    FocusManager.instance.primaryFocus?.unfocus();
     await showBottomSheetScreen(
         globalNavigatorKey.currentState!.context, const SettingsScreen());
   }
 
   Future<void> onTapDog(Dog dog) async {
+    if (sheetIsOpen) {
+      await closeSheet();
+    }
     await showDialog(
       context: globalNavigatorKey.currentState!.context,
       builder: (context) => DogDetail(
         dog: dog,
         onTapGenerate: () async {
           final randomImageURL = await getRandomDogByBreed(dog.name);
-          // ignore: use_build_context_synchronously
           await showDialog(
             context: context,
             builder: (_) => RandomDogDialogContent(imageURL: randomImageURL),
@@ -158,7 +176,7 @@ class HomeControllerBloc extends Bloc<HomeAction, HomeActionResult>
   Future<void> onTapSearchBar() async {
     if (!sheetIsOpen && !onTapSearchBarLock) {
       onTapSearchBarLock = true;
-      await draggableScrollableController?.animateTo(0.5,
+      await draggableScrollableController?.animateTo(0.55,
           duration: kAppAnimationDuration, curve: Curves.decelerate);
       draggableFocusNode?.requestFocus();
       sheetIsOpen = true;
@@ -167,12 +185,14 @@ class HomeControllerBloc extends Bloc<HomeAction, HomeActionResult>
   }
 
   Future<void> closeSheet() async {
-    closeAnimationLock = true;
-    await draggableScrollableController?.animateTo(0,
-        duration: kAppAnimationDuration, curve: Curves.decelerate);
-    sheetIsOpen = false;
-    closeAnimationLock = false;
-    draggableFocusNode?.unfocus();
+    if (!closeAnimationLock) {
+      closeAnimationLock = true;
+      await draggableScrollableController?.animateTo(0,
+          duration: kAppAnimationDuration, curve: Curves.decelerate);
+      sheetIsOpen = false;
+      closeAnimationLock = false;
+      draggableFocusNode?.unfocus();
+    }
   }
 
   Future<void> draggableListener() async {
@@ -183,14 +203,16 @@ class HomeControllerBloc extends Bloc<HomeAction, HomeActionResult>
         MediaQuery.of(globalNavigatorKey.currentState!.context).viewPadding;
     // Height (without status and toolbar)
     height = height - padding.top - kToolbarHeight;
-    if (draggableScrollableController!.pixels < height / 2 &&
-        !closeAnimationLock) {
+    if (draggableScrollableController!.pixels < height * 0.55) {
       await closeSheet();
     }
   }
 
   Future<void> keyboardFocusListener() async {
-    if (sheetIsOpen) await closeSheet();
+    if (keyboardIsOpen && sheetIsOpen) return;
+    if (!keyboardIsOpen && !sheetIsOpen) return;
+    // If keyboard is unfocused close the sheet too
+    if (!keyboardIsOpen) await closeSheet();
   }
 
   void searchListener() {

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:phodog/application/config/theme/app_text_styles.dart';
-import 'package:phodog/core/extensions/context_extensions.dart';
 
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../config/theme/app_text_styles.dart';
+import '../../../../core/extensions/context_extensions.dart';
 import '../../../common/app_strings.dart';
 
 class DraggableSearchField extends StatefulWidget {
@@ -11,41 +12,17 @@ class DraggableSearchField extends StatefulWidget {
     this.draggableScrollableController,
     this.textEditingController,
     this.focusNode,
-    this.onKeyboardStateChange,
   });
 
   final DraggableScrollableController? draggableScrollableController;
   final TextEditingController? textEditingController;
   final FocusNode? focusNode;
-  final Function? onKeyboardStateChange;
 
   @override
   State<DraggableSearchField> createState() => _DraggableSearchFieldState();
 }
 
-class _DraggableSearchFieldState extends State<DraggableSearchField>
-    with WidgetsBindingObserver {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void didChangeMetrics() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (MediaQuery.of(context).viewInsets.bottom == 0) {
-        widget.onKeyboardStateChange?.call();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
+class _DraggableSearchFieldState extends State<DraggableSearchField> {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(

@@ -23,3 +23,14 @@ class GetRandomDogByBreed implements HomeAction {
 
   const GetRandomDogByBreed({required this.breed});
 }
+
+@immutable
+class KeyboardOpenAction implements HomeAction {
+  const KeyboardOpenAction();
+}
+
+@immutable
+class KeyboardCloseAction implements HomeAction {
+  const KeyboardCloseAction();
+}
+

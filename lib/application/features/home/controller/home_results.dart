@@ -38,3 +38,14 @@ class HomeActionFailure implements HomeActionResult {
   final StackTrace? stackTrace;
   const HomeActionFailure(this.errorMessage, {this.stackTrace});
 }
+
+enum KeyboardStatus {
+  open,
+  close,
+}
+
+@immutable
+class KeyboardStateChange implements HomeActionResult {
+  final KeyboardStatus keyboardStatus;
+  const KeyboardStateChange(this.keyboardStatus);
+}
