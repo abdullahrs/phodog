@@ -21,6 +21,12 @@ class RandomDogDialogContent extends StatelessWidget {
               height: 256.w,
               width: 256.w,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Placeholder(
+                  fallbackHeight : 256.w,
+                  fallbackWidth : 256.w,
+                );
+              },
             ),
           ),
           SizedBox(height: 16.h),

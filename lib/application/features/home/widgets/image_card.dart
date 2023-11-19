@@ -31,7 +31,7 @@ class ImageCard extends StatelessWidget {
                   image: imageProvider!,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
-                    return const Placeholder();
+                    return const AbsorbPointer(child: Placeholder());
                   },
                 ),
               ),
